@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Análise de Fila - Restaurante</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Tailwind slate-50 */
+        }
+        
+        /* Custom Scrollbar for the table */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Toast Animation */
+        @keyframes slideInUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .toast-enter {
+            animation: slideInUp 0.3s ease-out forwards;
+        }
+        .toast-exit {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header & Clock -->
+    <header class="bg-white shadow-sm border-b border-slate-200 py-4 px-6 flex justify-between items-center z-10 shrink-0">
+        <div class="flex items-center gap-3">
+            <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h1 class="text-xl font-bold text-slate-700 tracking-tight">Queue<span class="text-indigo-600">Sync</span></h1>
+        </div>
+        <div class="flex flex-col items-end">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Horário Atual</span>
+            <div id="clock" class="text-3xl font-bold text-slate-800 font-mono tracking-tighter">
+                00:00:00
+            </div>
+        </div>
+    </header>
+
+    <!-- View: Role Selection -->
+    <main id="view-role" class="flex-1 flex flex-col p-6 max-w-md mx-auto w-full gap-5 justify-center">
+        <div class="text-center mb-2">
+            <h2 class="text-2xl font-bold text-slate-800">Selecione seu Perfil</h2>
+            <p class="text-slate-500 mt-1">Como você usará este dispositivo?</p>
+        </div>
+        
+        <!-- Global Queue Selector -->
+        <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-2 items-center relative mb-4">
+            <select id="global-queue-selector" class="flex-1 bg-transparent text-slate-700 p-3 font-bold text-lg focus:outline-none cursor-pointer appearance-none z-10 w-full">
+                <!-- Options filled by JS -->
+            </select>
+            <div class="pointer-events-none absolute right-4 text-slate-400 z-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+        </div>
+
+        <button id="btn-role-start" class="w-full py-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl shadow-lg shadow-emerald-500/30 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="text-xl font-bold">1. Início da Fila</span>
+            <span class="text-emerald-100 text-sm">Registrar Entrada (Verde)</span>
+        </button>
+
+        <button id="btn-role-end" class="w-full py-5 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl shadow-lg shadow-rose-500/30 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span class="text-xl font-bold">2. Fim da Fila</span>
+            <span class="text-rose-100 text-sm">Registrar Atendimento (Vermelho)</span>
+        </button>
+
+        <button id="btn-role-admin" class="w-full py-5 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl shadow-lg shadow-slate-800/30 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span class="text-xl font-bold">3. Administrador</span>
+            <span class="text-slate-400 text-sm">Painel Completo e Relatórios</span>
+        </button>
+    </main>
+
+    <!-- View: Action (Start/End focused on Mobile) -->
+    <main id="view-action" class="hidden flex-1 flex flex-col overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white shadow-sm z-10 shrink-0">
+            <button class="btn-back text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Voltar
+            </button>
+            <span id="action-queue-name" class="font-bold text-indigo-700 bg-indigo-50 px-4 py-1.5 rounded-full text-sm border border-indigo-100">Fila</span>
+        </div>
+        <div class="flex-1 p-6 flex flex-col items-center justify-center bg-slate-50">
+            <!-- Giant Enter -->
+            <button id="btn-giant-enter" class="hidden w-full max-w-[320px] aspect-square bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-[0_20px_50px_-12px_rgba(16,185,129,0.5)] flex flex-col items-center justify-center gap-4 transition-all duration-200 active:scale-90 active:shadow-sm">
+                <svg class="w-24 h-24 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-4xl font-bold tracking-tight">ENTRADA</span>
+                <span class="text-emerald-100 font-medium text-lg">Novo Cliente</span>
+            </button>
+
+            <!-- Giant Exit -->
+            <button id="btn-giant-exit" class="hidden w-full max-w-[320px] aspect-square bg-rose-500 hover:bg-rose-600 text-white rounded-full shadow-[0_20px_50px_-12px_rgba(244,63,94,0.5)] flex flex-col items-center justify-center gap-4 transition-all duration-200 active:scale-90 active:shadow-sm disabled:opacity-60 disabled:active:scale-100 disabled:shadow-none">
+                <svg class="w-24 h-24 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-4xl font-bold tracking-tight">PRÓXIMO</span>
+                <span id="giant-exit-count" class="bg-white/20 px-4 py-1.5 rounded-full text-white font-semibold text-sm">0 aguardando</span>
+            </button>
+        </div>
+    </main>
+
+    <!-- Main Content (Admin View) -->
+    <main id="view-admin" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        <!-- Overlay Back Button for Admin -->
+        <div class="absolute top-4 left-4 lg:left-6 z-20">
+            <button class="btn-back bg-white border border-slate-200 shadow-sm text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-xl flex items-center gap-1 font-medium text-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Perfis
+            </button>
+        </div>
+
+        <!-- Left Panel: Controls & Stats -->
+        <section class="w-full lg:w-1/3 bg-slate-50 p-6 pt-16 flex flex-col gap-6 overflow-y-auto border-r border-slate-200">
+            
+            <!-- Queue Selector -->
+            <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-2 items-center relative">
+                <select id="queue-selector" class="flex-1 bg-transparent text-slate-700 p-3 font-bold text-lg focus:outline-none cursor-pointer appearance-none z-10 w-full">
+                    <option value="Recarga de Crédito">Recarga de Crédito</option>
+                    <option value="Fila da Comida">Fila da Comida</option>
+                </select>
+                <div class="pointer-events-none absolute right-16 text-slate-400 z-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <button id="btn-add-queue" class="bg-indigo-50 text-indigo-600 w-12 h-12 rounded-xl font-bold hover:bg-indigo-100 transition-colors flex items-center justify-center shrink-0 z-10" title="Nova Fila">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                </button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-4">
+                <button id="btn-enter" class="relative overflow-hidden group bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-2xl p-6 shadow-lg shadow-emerald-500/30 transition-all duration-200 flex items-center justify-between">
+                    <div class="flex flex-col items-start relative z-10">
+                        <span class="text-emerald-100 text-sm font-semibold uppercase tracking-wider mb-1">Novo Cliente</span>
+                        <span class="text-2xl font-bold">Entrada na Fila</span>
+                    </div>
+                    <svg class="w-10 h-10 text-emerald-200 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-active:transition-none group-active:translate-x-0 transition-transform duration-500"></div>
+                </button>
+
+                <button id="btn-exit" class="relative overflow-hidden group bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white rounded-2xl p-6 shadow-lg shadow-rose-500/30 transition-all duration-200 flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed">
+                    <div class="flex flex-col items-start relative z-10">
+                        <span class="text-rose-100 text-sm font-semibold uppercase tracking-wider mb-1">Próximo</span>
+                        <span class="text-2xl font-bold">Atendimento</span>
+                    </div>
+                    <svg class="w-10 h-10 text-rose-200 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-active:transition-none group-active:translate-x-0 transition-transform duration-500"></div>
+                </button>
+            </div>
+
+            <hr class="border-slate-200">
+
+            <!-- Stats Dashboard -->
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Stat Card 1 -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <span class="text-slate-400 text-xs font-semibold uppercase tracking-wide">Na Fila Agora</span>
+                    <span id="stat-queue" class="text-3xl font-bold text-amber-500 mt-2">0</span>
+                </div>
+                <!-- Stat Card 2 -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <span class="text-slate-400 text-xs font-semibold uppercase tracking-wide">Total Atendidos</span>
+                    <span id="stat-served" class="text-3xl font-bold text-indigo-500 mt-2">0</span>
+                </div>
+                <!-- Stat Card 3 (Full width) -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 col-span-2 flex flex-col justify-between">
+                    <span class="text-slate-400 text-xs font-semibold uppercase tracking-wide">Tempo Médio de Espera</span>
+                    <div class="flex items-end gap-2 mt-2">
+                        <span id="stat-avg-time" class="text-3xl font-bold text-slate-700">00:00</span>
+                        <span class="text-sm font-medium text-slate-400 mb-1">min:seg</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-6 flex flex-col gap-3">
+                <button id="btn-export" class="w-full py-3 bg-white border border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Exportar CSV
+                </button>
+                <button id="btn-clear" class="w-full py-3 bg-white border border-rose-200 text-rose-600 font-semibold rounded-xl hover:bg-rose-50 transition-colors flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Limpar Dados
+                </button>
+            </div>
+        </section>
+
+        <!-- Right Panel: Data Table -->
+        <section class="w-full lg:w-2/3 bg-white flex flex-col h-full">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10 shrink-0">
+                <h2 class="text-lg font-bold text-slate-700">Registro de Atendimentos</h2>
+            </div>
+            
+            <div class="flex-1 overflow-auto table-container relative">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-slate-50/95 backdrop-blur shadow-sm z-10">
+                        <tr>
+                            <th class="py-3 px-6 text-xs font-semibold text-slate-500 uppercase w-16 text-center">ID</th>
+                            <th class="py-3 px-6 text-xs font-semibold text-emerald-600 uppercase">Chegada (Verde)</th>
+                            <th class="py-3 px-6 text-xs font-semibold text-rose-600 uppercase">Atendimento (Vermelho)</th>
+                            <th class="py-3 px-6 text-xs font-semibold text-slate-500 uppercase">Tempo de Espera</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-slate-100">
+                        <!-- Rows will be injected here by JS -->
+                    </tbody>
+                </table>
+                
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 opacity-60">
+                    <svg class="w-16 h-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <p class="text-slate-500 font-medium">Nenhum registro ainda.</p>
+                    <p class="text-slate-400 text-sm">Clique em "Entrada na Fila" para iniciar.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Confirmation Modal (Custom alert replacement) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform scale-95 transition-transform duration-200" id="confirm-modal-content">
+            <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Atenção!</h3>
+            <p class="text-slate-500 text-sm mb-6">Tem certeza que deseja apagar todos os dados? Esta ação não pode ser desfeita.</p>
+            <div class="flex gap-3 justify-end">
+                <button id="modal-cancel" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors">Cancelar</button>
+                <button id="modal-confirm" class="px-4 py-2 bg-rose-600 text-white font-medium rounded-lg hover:bg-rose-700 transition-colors">Sim, apagar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Queue Modal -->
+    <div id="queue-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform scale-95 transition-transform duration-200" id="queue-modal-content">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Nova Fila</h3>
+            <p class="text-slate-500 text-sm mb-4">Digite o nome da nova fila para gerenciar.</p>
+            <input type="text" id="new-queue-name" class="w-full bg-slate-50 border border-slate-300 text-slate-700 rounded-lg p-3 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6" placeholder="Ex: Fila de Bebidas">
+            <div class="flex gap-3 justify-end">
+                <button id="queue-modal-cancel" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors">Cancelar</button>
+                <button id="queue-modal-confirm" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">Criar Fila</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'queue-app-id';
+        let firebaseConfig = null;
+        try {
+            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        } catch (e) { console.error(e); }
+
+        let db, auth, user;
+
+        // --- State Management ---
+        let allEvents = [];
+        let allQueues = ['Recarga de Crédito', 'Fila da Comida'];
+        let currentQueue = 'Recarga de Crédito';
+
+        // --- DOM Elements ---
+        const viewRole = document.getElementById('view-role');
+        const viewAction = document.getElementById('view-action');
+        const viewAdmin = document.getElementById('view-admin');
+        const btnRoleStart = document.getElementById('btn-role-start');
+        const btnRoleEnd = document.getElementById('btn-role-end');
+        const btnRoleAdmin = document.getElementById('btn-role-admin');
+        const globalQueueSelector = document.getElementById('global-queue-selector');
+        const actionQueueName = document.getElementById('action-queue-name');
+        const btnGiantEnter = document.getElementById('btn-giant-enter');
+        const btnGiantExit = document.getElementById('btn-giant-exit');
+        const giantExitCount = document.getElementById('giant-exit-count');
+        const btnsBack = document.querySelectorAll('.btn-back');
+
+        const clockEl = document.getElementById('clock');
+        const btnEnter = document.getElementById('btn-enter');
+        const btnExit = document.getElementById('btn-exit');
+        const btnClear = document.getElementById('btn-clear');
+        const btnExport = document.getElementById('btn-export');
+        
+        const queueSelector = document.getElementById('queue-selector');
+        const btnAddQueue = document.getElementById('btn-add-queue');
+        const queueModal = document.getElementById('queue-modal');
+        const queueModalContent = document.getElementById('queue-modal-content');
+        const queueModalCancel = document.getElementById('queue-modal-cancel');
+        const queueModalConfirm = document.getElementById('queue-modal-confirm');
+        const newQueueNameInput = document.getElementById('new-queue-name');
+        
+        const statQueue = document.getElementById('stat-queue');
+        const statServed = document.getElementById('stat-served');
+        const statAvgTime = document.getElementById('stat-avg-time');
+        
+        const tableBody = document.getElementById('table-body');
+        const emptyState = document.getElementById('empty-state');
+        
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmModalContent = document.getElementById('confirm-modal-content');
+        const modalCancel = document.getElementById('modal-cancel');
+        const modalConfirm = document.getElementById('modal-confirm');
+        const toastContainer = document.getElementById('toast-container');
+
+        // --- Initialization ---
+        async function init() {
+            updateClock();
+            setInterval(updateClock, 1000);
+            setupEventListeners();
+            
+            if (firebaseConfig) {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    user = auth.currentUser;
+                    setupRealtimeListeners();
+                } catch (e) {
+                    console.error("Auth error", e);
+                    showToast('Erro de conexão ao servidor.', 'error');
+                }
+            } else {
+                showToast('Modo Offline: Sincronização desativada.', 'error');
+            }
+        }
+
+        function setupRealtimeListeners() {
+            if (!user) return;
+            
+            // Listen to Events
+            const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'queue_events');
+            onSnapshot(eventsRef, (snapshot) => {
+                allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                render();
+            }, (error) => { console.error("Error listening to events", error); });
+
+            // Listen to Custom Queues
+            const queuesRef = collection(db, 'artifacts', appId, 'public', 'data', 'queues');
+            onSnapshot(queuesRef, (snapshot) => {
+                const customQueues = snapshot.docs.map(doc => doc.data().name);
+                allQueues = [...new Set(['Recarga de Crédito', 'Fila da Comida', ...customQueues])];
+                updateQueueSelector();
+            }, (error) => { console.error("Error listening to queues", error); });
+        }
+
+        function updateQueueSelector() {
+            const currentVal = queueSelector.value || currentQueue;
+            queueSelector.innerHTML = '';
+            globalQueueSelector.innerHTML = '';
+            
+            allQueues.forEach(q => {
+                const opt1 = document.createElement('option');
+                opt1.value = q;
+                opt1.innerText = q;
+                queueSelector.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = q;
+                opt2.innerText = q;
+                globalQueueSelector.appendChild(opt2);
+            });
+            
+            if (allQueues.includes(currentVal)) {
+                queueSelector.value = currentVal;
+                globalQueueSelector.value = currentVal;
+                currentQueue = currentVal;
+            } else {
+                currentQueue = allQueues[0];
+                queueSelector.value = currentQueue;
+                globalQueueSelector.value = currentQueue;
+            }
+            
+            actionQueueName.innerText = currentQueue;
+            render();
+        }
+
+        // --- Core Logic ---
+        async function handleEntry() {
+            if (!user) return showToast('Aguarde a conexão...', 'error');
+            const now = Date.now();
+            const ticketId = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'queue_events'), {
+                    ticketId: ticketId,
+                    arrival: now,
+                    service: null,
+                    waitTimeMs: null,
+                    queueName: currentQueue
+                });
+                showToast('Cliente adicionado à fila!', 'success');
+            } catch (e) {
+                console.error(e);
+                showToast('Erro ao adicionar.', 'error');
+            }
+        }
+
+        async function handleService() {
+            if (!user) return;
+            
+            // Get pending items for current queue, sort oldest first
+            const currentQueueEvents = allEvents.filter(e => e.queueName === currentQueue);
+            const pending = currentQueueEvents.filter(item => item.service === null)
+                                              .sort((a, b) => a.arrival - b.arrival);
+            
+            if (pending.length > 0) {
+                const nextPerson = pending[0];
+                const now = Date.now();
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'queue_events', nextPerson.id), {
+                        service: now,
+                        waitTimeMs: now - nextPerson.arrival
+                    });
+                    showToast(`Senha #${nextPerson.ticketId} atendida!`, 'success');
+                } catch(e) {
+                    console.error(e);
+                    showToast('Erro ao atualizar atendimento.', 'error');
+                }
+            } else {
+                showToast('Esta fila está vazia!', 'error');
+            }
+        }
+
+        async function clearData() {
+            if (!user) return;
+            closeModal();
+            const currentQueueEvents = allEvents.filter(e => e.queueName === currentQueue);
+            
+            try {
+                for (const event of currentQueueEvents) {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'queue_events', event.id));
+                }
+                showToast(`Dados de ${currentQueue} limpos.`, 'info');
+            } catch (e) {
+                console.error(e);
+                showToast('Erro ao limpar dados.', 'error');
+            }
+        }
+
+        async function addNewQueue() {
+            if (!user) return;
+            const qName = newQueueNameInput.value.trim();
+            if (!qName) return;
+            
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'queues'), {
+                    name: qName,
+                    createdAt: Date.now()
+                });
+                newQueueNameInput.value = '';
+                closeQueueModal();
+                showToast('Fila criada!', 'success');
+                currentQueue = qName;
+                queueSelector.value = qName;
+                render();
+            } catch (e) {
+                console.error(e);
+                showToast('Erro ao criar fila.', 'error');
+            }
+        }
+
+        function exportCSV() {
+            const currentQueueEvents = allEvents.filter(e => e.queueName === currentQueue)
+                                                .sort((a, b) => a.arrival - b.arrival);
+            
+            if (currentQueueEvents.length === 0) {
+                showToast('Nenhum dado para exportar.', 'error');
+                return;
+            }
+
+            let csv = "Ticket ID,Chegada,Atendimento,Tempo de Espera (Segundos),Fila\n";
+            currentQueueEvents.forEach(row => {
+                const arrTime = formatTime(new Date(row.arrival));
+                const servTime = row.service ? formatTime(new Date(row.service)) : 'Pendente';
+                const waitSecs = row.waitTimeMs !== null ? Math.floor(row.waitTimeMs / 1000) : '';
+                csv += `${row.ticketId},${arrTime},${servTime},${waitSecs},${row.queueName}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `relatorio_${currentQueue.replace(/\s+/g, '_')}_${formatDate(new Date())}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('Relatório CSV exportado!', 'success');
+        }
+
+        // --- Render & UI Updates ---
+        function render() {
+            const currentQueueEvents = allEvents.filter(e => e.queueName === currentQueue)
+                                                .sort((a, b) => a.arrival - b.arrival);
+            
+            updateStats(currentQueueEvents);
+            renderTable(currentQueueEvents);
+        }
+
+        function updateStats(currentEvents) {
+            const inQueueCount = currentEvents.filter(item => item.service === null).length;
+            const servedData = currentEvents.filter(item => item.service !== null);
+            const servedCount = servedData.length;
+            
+            let avgTimeFormatted = "00:00";
+            if (servedCount > 0) {
+                const totalMs = servedData.reduce((acc, curr) => acc + curr.waitTimeMs, 0);
+                const avgMs = totalMs / servedCount;
+                avgTimeFormatted = formatDuration(avgMs);
+            }
+
+            statQueue.innerText = inQueueCount;
+            statServed.innerText = servedCount;
+            statAvgTime.innerText = avgTimeFormatted;
+
+            if (inQueueCount === 0) {
+                btnExit.setAttribute('disabled', 'true');
+                btnExit.classList.remove('hover:bg-rose-600', 'active:bg-rose-700', 'shadow-lg');
+                btnGiantExit.setAttribute('disabled', 'true');
+            } else {
+                btnExit.removeAttribute('disabled');
+                btnExit.classList.add('hover:bg-rose-600', 'active:bg-rose-700', 'shadow-lg');
+                btnGiantExit.removeAttribute('disabled');
+            }
+            
+            giantExitCount.innerText = `${inQueueCount} aguardando`;
+        }
+
+        function renderTable(currentEvents) {
+            tableBody.innerHTML = '';
+            
+            if (currentEvents.length === 0) {
+                emptyState.classList.remove('hidden');
+                tableBody.parentElement.classList.add('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                tableBody.parentElement.classList.remove('hidden');
+                
+                currentEvents.forEach(item => {
+                    const tr = document.createElement('tr');
+                    const isPending = item.service === null;
+                    
+                    tr.className = `group hover:bg-slate-50 transition-colors ${isPending ? 'bg-amber-50/30' : ''}`;
+                    
+                    const tdId = document.createElement('td');
+                    tdId.className = 'py-3 px-6 border-b border-slate-100 text-center text-sm font-semibold text-slate-400';
+                    tdId.innerText = `#${item.ticketId}`;
+
+                    const tdArr = document.createElement('td');
+                    tdArr.className = 'py-3 px-6 border-b border-slate-100 text-sm font-medium text-emerald-700';
+                    tdArr.innerText = formatTime(new Date(item.arrival));
+
+                    const tdServ = document.createElement('td');
+                    tdServ.className = 'py-3 px-6 border-b border-slate-100 text-sm font-medium';
+                    if (isPending) {
+                        tdServ.innerHTML = `<span class="inline-flex items-center gap-1 text-amber-600 bg-amber-100 px-2 py-1 rounded-md text-xs font-semibold animate-pulse"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span> Aguardando</span>`;
+                    } else {
+                        tdServ.className += ' text-rose-700';
+                        tdServ.innerText = formatTime(new Date(item.service));
+                    }
+
+                    const tdWait = document.createElement('td');
+                    tdWait.className = 'py-3 px-6 border-b border-slate-100 text-sm font-mono text-slate-600';
+                    tdWait.innerText = isPending ? '--:--' : formatDuration(item.waitTimeMs);
+
+                    tr.appendChild(tdId);
+                    tr.appendChild(tdArr);
+                    tr.appendChild(tdServ);
+                    tr.appendChild(tdWait);
+                    
+                    tableBody.appendChild(tr);
+                });
+
+                const container = tableBody.closest('.table-container');
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        // --- Helpers ---
+        function updateClock() {
+            const now = new Date();
+            clockEl.innerText = formatTime(now);
+        }
+
+        function formatTime(date) {
+            const h = String(date.getHours()).padStart(2, '0');
+            const m = String(date.getMinutes()).padStart(2, '0');
+            const s = String(date.getSeconds()).padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+        
+        function formatDate(date) {
+            const d = String(date.getDate()).padStart(2, '0');
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const y = date.getFullYear();
+            return `${y}${m}${d}`;
+        }
+
+        function formatDuration(ms) {
+            const totalSecs = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSecs / 60);
+            const seconds = totalSecs % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // --- UI Interactions ---
+        function setupEventListeners() {
+            btnEnter.addEventListener('click', handleEntry);
+            btnExit.addEventListener('click', handleService);
+            
+            btnClear.addEventListener('click', openModal);
+            modalCancel.addEventListener('click', closeModal);
+            modalConfirm.addEventListener('click', clearData);
+            
+            btnExport.addEventListener('click', exportCSV);
+
+            // View Switching Logic
+            btnRoleStart.addEventListener('click', () => showView('start'));
+            btnRoleEnd.addEventListener('click', () => showView('end'));
+            btnRoleAdmin.addEventListener('click', () => showView('admin'));
+
+            btnsBack.forEach(btn => btn.addEventListener('click', () => showView('role')));
+
+            btnGiantEnter.addEventListener('click', handleEntry);
+            btnGiantExit.addEventListener('click', handleService);
+
+            // Queue Selectors
+            queueSelector.addEventListener('change', (e) => {
+                currentQueue = e.target.value;
+                globalQueueSelector.value = currentQueue;
+                actionQueueName.innerText = currentQueue;
+                render();
+            });
+            
+            globalQueueSelector.addEventListener('change', (e) => {
+                currentQueue = e.target.value;
+                queueSelector.value = currentQueue;
+                actionQueueName.innerText = currentQueue;
+                render();
+            });
+            
+            // Add Queue Modal
+            btnAddQueue.addEventListener('click', openQueueModal);
+            queueModalCancel.addEventListener('click', closeQueueModal);
+            queueModalConfirm.addEventListener('click', addNewQueue);
+        }
+
+        function showView(view) {
+            viewRole.classList.add('hidden');
+            viewAction.classList.add('hidden');
+            viewAdmin.classList.add('hidden');
+            
+            btnGiantEnter.classList.add('hidden');
+            btnGiantExit.classList.add('hidden');
+
+            actionQueueName.innerText = currentQueue;
+
+            if (view === 'role') {
+                viewRole.classList.remove('hidden');
+            } else if (view === 'admin') {
+                viewAdmin.classList.remove('hidden');
+            } else if (view === 'start') {
+                viewAction.classList.remove('hidden');
+                btnGiantEnter.classList.remove('hidden');
+            } else if (view === 'end') {
+                viewAction.classList.remove('hidden');
+                btnGiantExit.classList.remove('hidden');
+            }
+        }
+
+        function openModal() {
+            confirmModal.classList.remove('hidden');
+            setTimeout(() => {
+                confirmModal.classList.remove('opacity-0');
+                confirmModalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            confirmModal.classList.add('opacity-0');
+            confirmModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                confirmModal.classList.add('hidden');
+            }, 200); 
+        }
+
+        function openQueueModal() {
+            queueModal.classList.remove('hidden');
+            setTimeout(() => {
+                queueModal.classList.remove('opacity-0');
+                queueModalContent.classList.remove('scale-95');
+            }, 10);
+            newQueueNameInput.focus();
+        }
+
+        function closeQueueModal() {
+            queueModal.classList.add('opacity-0');
+            queueModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                queueModal.classList.add('hidden');
+            }, 200);
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            
+            let bgClass, icon;
+            if (type === 'success') {
+                bgClass = 'bg-emerald-600';
+                icon = `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+            } else if (type === 'error') {
+                bgClass = 'bg-rose-600';
+                icon = `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+            } else {
+                bgClass = 'bg-slate-800';
+                icon = `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            }
+
+            toast.className = `${bgClass} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 toast-enter max-w-sm`;
+            toast.innerHTML = `${icon} <span class="font-medium text-sm">${message}</span>`;
+            
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-exit');
+                setTimeout(() => {
+                    if (toastContainer.contains(toast)) {
+                        toastContainer.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Start Application
+        init();
+    </script>
+</body>
+</html>
