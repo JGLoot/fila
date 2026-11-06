@@ -11,7 +11,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* Tailwind slate-50 */
+            background-color: #f8fafc;
         }
         
         /* Custom Scrollbar for the table */
@@ -244,7 +244,7 @@
         </section>
     </main>
 
-    <!-- Confirmation Modal (Custom alert replacement) -->
+    <!-- Confirmation Modal -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform scale-95 transition-transform duration-200" id="confirm-modal-content">
             <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
@@ -276,18 +276,28 @@
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-analytics.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+        import { getFirestore, doc, updateDoc, deleteDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
-        // --- Firebase Configuration ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'queue-app-id';
-        let firebaseConfig = null;
-        try {
-            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        } catch (e) { console.error(e); }
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOhHWXVUb5kt2zxdKLw2g5gSMFpEXK5V8",
+            authDomain: "fila-9bd40.firebaseapp.com",
+            projectId: "fila-9bd40",
+            storageBucket: "fila-9bd40.firebasestorage.app",
+            messagingSenderId: "550178924460",
+            appId: "1:550178924460:web:b3a4dad1d1af764b40bc09",
+            measurementId: "G-QE3EQ137VC"
+        };
 
-        let db, auth, user;
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        let user;
 
         // --- State Management ---
         let allEvents = [];
@@ -341,45 +351,33 @@
             setInterval(updateClock, 1000);
             setupEventListeners();
             
-            if (firebaseConfig) {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                    user = auth.currentUser;
-                    setupRealtimeListeners();
-                } catch (e) {
-                    console.error("Auth error", e);
-                    showToast('Erro de conexão ao servidor.', 'error');
-                }
-            } else {
-                showToast('Modo Offline: Sincronização desativada.', 'error');
+            try {
+                await signInAnonymously(auth);
+                user = auth.currentUser;
+                setupRealtimeListeners();
+            } catch (e) {
+                console.error("Auth error", e);
+                showToast('Erro de conexão: Ative o login Anônimo no Firebase.', 'error');
             }
         }
 
         function setupRealtimeListeners() {
             if (!user) return;
             
-            // Listen to Events
-            const eventsRef = collection(db, 'artifacts', appId, 'public', 'data', 'queue_events');
+            // Listen to Events na raiz do banco
+            const eventsRef = collection(db, 'queue_events');
             onSnapshot(eventsRef, (snapshot) => {
                 allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 render();
-            }, (error) => { console.error("Error listening to events", error); });
+            }, (error) => { console.error("Erro ao ouvir eventos", error); });
 
-            // Listen to Custom Queues
-            const queuesRef = collection(db, 'artifacts', appId, 'public', 'data', 'queues');
+            // Listen to Custom Queues na raiz do banco
+            const queuesRef = collection(db, 'queues');
             onSnapshot(queuesRef, (snapshot) => {
                 const customQueues = snapshot.docs.map(doc => doc.data().name);
                 allQueues = [...new Set(['Recarga de Crédito', 'Fila da Comida', ...customQueues])];
                 updateQueueSelector();
-            }, (error) => { console.error("Error listening to queues", error); });
+            }, (error) => { console.error("Erro ao ouvir filas", error); });
         }
 
         function updateQueueSelector() {
@@ -420,7 +418,7 @@
             const ticketId = Math.floor(1000 + Math.random() * 9000).toString();
             
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'queue_events'), {
+                await addDoc(collection(db, 'queue_events'), {
                     ticketId: ticketId,
                     arrival: now,
                     service: null,
@@ -437,7 +435,6 @@
         async function handleService() {
             if (!user) return;
             
-            // Get pending items for current queue, sort oldest first
             const currentQueueEvents = allEvents.filter(e => e.queueName === currentQueue);
             const pending = currentQueueEvents.filter(item => item.service === null)
                                               .sort((a, b) => a.arrival - b.arrival);
@@ -446,7 +443,7 @@
                 const nextPerson = pending[0];
                 const now = Date.now();
                 try {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'queue_events', nextPerson.id), {
+                    await updateDoc(doc(db, 'queue_events', nextPerson.id), {
                         service: now,
                         waitTimeMs: now - nextPerson.arrival
                     });
@@ -467,7 +464,7 @@
             
             try {
                 for (const event of currentQueueEvents) {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'queue_events', event.id));
+                    await deleteDoc(doc(db, 'queue_events', event.id));
                 }
                 showToast(`Dados de ${currentQueue} limpos.`, 'info');
             } catch (e) {
@@ -482,7 +479,7 @@
             if (!qName) return;
             
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'queues'), {
+                await addDoc(collection(db, 'queues'), {
                     name: qName,
                     createdAt: Date.now()
                 });
