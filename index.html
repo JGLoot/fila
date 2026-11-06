@@ -73,10 +73,11 @@
             <p class="text-slate-500 mt-1">Como você usará este dispositivo?</p>
         </div>
         
-        <!-- Global Queue Selector -->
+       <!-- Global Queue Selector -->
         <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-2 items-center relative mb-4">
-            <select id="global-queue-selector" class="flex-1 bg-transparent text-slate-700 p-3 font-bold text-lg focus:outline-none cursor-pointer appearance-none z-10 w-full">
-                <!-- Options filled by JS -->
+            <select id="global-queue-selector" class="flex-1 bg-transparent text-slate-700 p-3 font-bold text-lg focus:outline-none cursor-pointer appearance-none z-10 w-full relative">
+                <option value="Recarga de Crédito">Recarga de Crédito</option>
+                <option value="Fila da Comida">Fila da Comida</option>
             </select>
             <div class="pointer-events-none absolute right-4 text-slate-400 z-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -345,10 +346,11 @@
         const modalConfirm = document.getElementById('modal-confirm');
         const toastContainer = document.getElementById('toast-container');
 
-        // --- Initialization ---
+// --- Initialization ---
         async function init() {
             updateClock();
             setInterval(updateClock, 1000);
+            updateQueueSelector(); // <--- ADICIONE ESTA LINHA AQUI
             setupEventListeners();
             
             try {
