@@ -14,19 +14,23 @@
             background-color: #f8fafc;
         }
         
-        /* Custom Scrollbar for the table */
+        /* Custom Scrollbar for the table and sidebars */
+        .custom-scrollbar::-webkit-scrollbar,
         .table-container::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
+        .custom-scrollbar::-webkit-scrollbar-track,
         .table-container::-webkit-scrollbar-track {
             background: #f1f5f9; 
             border-radius: 4px;
         }
+        .custom-scrollbar::-webkit-scrollbar-thumb,
         .table-container::-webkit-scrollbar-thumb {
             background: #cbd5e1; 
             border-radius: 4px;
         }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover,
         .table-container::-webkit-scrollbar-thumb:hover {
             background: #94a3b8; 
         }
@@ -67,14 +71,14 @@
     </header>
 
     <!-- View: Role Selection -->
-    <main id="view-role" class="flex-1 flex flex-col p-6 max-w-md mx-auto w-full gap-5 justify-center overflow-y-auto">
+    <main id="view-role" class="flex-1 flex flex-col p-6 max-w-md mx-auto w-full gap-5 overflow-y-auto py-10">
         <div class="text-center mb-2">
             <h2 class="text-2xl font-bold text-slate-800">Selecione seu Perfil</h2>
             <p class="text-slate-500 mt-1">Como você usará este dispositivo?</p>
         </div>
         
        <!-- Global Queue Selector -->
-        <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-2 items-center relative mb-4">
+        <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-2 items-center relative mb-4 shrink-0">
             <select id="global-queue-selector" class="flex-1 bg-transparent text-slate-700 p-3 font-bold text-lg focus:outline-none cursor-pointer appearance-none z-10 w-full relative">
                 <option value="Recarga de Crédito">Recarga de Crédito</option>
                 <option value="Fila da Comida">Fila da Comida</option>
@@ -84,19 +88,19 @@
             </div>
         </div>
 
-        <button id="btn-role-start" class="w-full py-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl shadow-lg shadow-emerald-500/30 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95">
+        <button id="btn-role-start" class="w-full py-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl shadow-lg shadow-emerald-500/30 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95 shrink-0">
             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span class="text-xl font-bold">1. Início da Fila</span>
             <span class="text-emerald-100 text-sm">Registrar Entrada (Verde)</span>
         </button>
 
-        <button id="btn-role-end" class="w-full py-5 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl shadow-lg shadow-rose-500/30 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95">
+        <button id="btn-role-end" class="w-full py-5 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl shadow-lg shadow-rose-500/30 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95 shrink-0">
             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             <span class="text-xl font-bold">2. Fim da Fila</span>
             <span class="text-rose-100 text-sm">Registrar Atendimento (Vermelho)</span>
         </button>
 
-        <button id="btn-role-admin" class="w-full py-5 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl shadow-lg shadow-slate-800/30 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95">
+        <button id="btn-role-admin" class="w-full py-5 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl shadow-lg shadow-slate-800/30 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95 shrink-0">
             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
             <span class="text-xl font-bold">3. Administrador</span>
             <span class="text-slate-400 text-sm">Painel Completo e Relatórios</span>
@@ -104,7 +108,7 @@
     </main>
 
     <!-- View: Action (Start/End focused on Mobile) -->
-    <main id="view-action" class="hidden flex-1 flex flex-col overflow-y-auto">
+    <main id="view-action" class="hidden flex-1 flex flex-col overflow-y-auto lg:overflow-hidden min-h-0">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white shadow-sm z-10 shrink-0">
             <button class="btn-back text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
@@ -112,23 +116,22 @@
             </button>
             <span id="action-queue-name" class="font-bold text-indigo-700 bg-indigo-50 px-4 py-1.5 rounded-full text-sm border border-indigo-100">Fila</span>
         </div>
-        <div class="flex-1 p-6 flex flex-col items-center justify-center bg-slate-50 min-h-0">
-            
+        <div class="flex-1 p-6 flex flex-col items-center justify-center bg-slate-50 relative">
             <!-- Giant Enter -->
-            <button id="btn-giant-enter" class="hidden w-full max-w-[320px] aspect-square bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-[0_20px_50px_-12px_rgba(16,185,129,0.5)] flex flex-col items-center justify-center gap-4 transition-all duration-200 active:scale-90 active:shadow-sm shrink-0">
+            <button id="btn-giant-enter" class="hidden w-full max-w-[320px] aspect-square bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-[0_20px_50px_-12px_rgba(16,185,129,0.5)] flex flex-col items-center justify-center gap-4 transition-all duration-200 active:scale-90 active:shadow-sm">
                 <svg class="w-24 h-24 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <span class="text-4xl font-bold tracking-tight">ENTRADA</span>
                 <span class="text-emerald-100 font-medium text-lg">Novo Cliente</span>
             </button>
 
-            <!-- Adicionar Lote (Action View) -->
-            <button id="btn-giant-add-batch" class="hidden mt-6 text-emerald-600 bg-emerald-50 px-5 py-2.5 rounded-full font-semibold text-sm border border-emerald-200 hover:bg-emerald-100 transition-colors flex items-center gap-2 shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                Adicionar Pessoas Existentes
+            <!-- Adicionar lote (só aparece no perfil de entrada) -->
+            <button id="btn-giant-bulk-add" class="hidden mt-8 text-indigo-600 font-semibold text-sm hover:text-indigo-800 transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                Inserir pessoas já na fila
             </button>
 
             <!-- Giant Exit -->
-            <button id="btn-giant-exit" class="hidden w-full max-w-[320px] aspect-square bg-rose-500 hover:bg-rose-600 text-white rounded-full shadow-[0_20px_50px_-12px_rgba(244,63,94,0.5)] flex flex-col items-center justify-center gap-4 transition-all duration-200 active:scale-90 active:shadow-sm disabled:opacity-60 disabled:active:scale-100 disabled:shadow-none shrink-0">
+            <button id="btn-giant-exit" class="hidden w-full max-w-[320px] aspect-square bg-rose-500 hover:bg-rose-600 text-white rounded-full shadow-[0_20px_50px_-12px_rgba(244,63,94,0.5)] flex flex-col items-center justify-center gap-4 transition-all duration-200 active:scale-90 active:shadow-sm disabled:opacity-60 disabled:active:scale-100 disabled:shadow-none">
                 <svg class="w-24 h-24 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 <span class="text-4xl font-bold tracking-tight">PRÓXIMO</span>
                 <span id="giant-exit-count" class="bg-white/20 px-4 py-1.5 rounded-full text-white font-semibold text-sm">0 aguardando</span>
@@ -136,8 +139,8 @@
         </div>
     </main>
 
-    <!-- Main Content (Admin View) -->
-    <main id="view-admin" class="hidden flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden relative">
+    <!-- Main Content (Admin View) usando GRID em Desktop e FLEX em Mobile -->
+    <main id="view-admin" class="hidden flex-1 flex-col lg:grid lg:grid-cols-3 overflow-y-auto lg:overflow-hidden relative">
         
         <!-- Overlay Back Button for Admin -->
         <div class="absolute top-4 left-4 lg:left-6 z-20">
@@ -147,9 +150,8 @@
             </button>
         </div>
 
-        <!-- Left Panel: Controls & Stats -->
-        <!-- NOTA: Foi adicionado lg:h-full lg:min-h-0 aqui para consertar o overflow no desktop -->
-        <section class="w-full lg:w-1/3 bg-slate-50 p-6 pt-16 flex flex-col gap-6 overflow-y-auto border-r border-slate-200 lg:h-full lg:min-h-0">
+        <!-- Left Panel: Controls & Stats (Com rolagem independente) -->
+        <section class="lg:col-span-1 bg-slate-50 p-5 lg:p-6 pt-16 flex flex-col gap-5 border-b lg:border-b-0 lg:border-r border-slate-200 lg:h-full lg:overflow-y-auto custom-scrollbar">
             
             <!-- Queue Selector -->
             <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-2 items-center relative shrink-0">
@@ -166,7 +168,7 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex flex-col gap-4 shrink-0">
+            <div class="flex flex-col gap-3 shrink-0">
                 <button id="btn-enter" class="relative overflow-hidden group bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-2xl p-6 shadow-lg shadow-emerald-500/30 transition-all duration-200 flex items-center justify-between">
                     <div class="flex flex-col items-start relative z-10">
                         <span class="text-emerald-100 text-sm font-semibold uppercase tracking-wider mb-1">Novo Cliente</span>
@@ -176,13 +178,13 @@
                     <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-active:transition-none group-active:translate-x-0 transition-transform duration-500"></div>
                 </button>
 
-                <!-- Adicionar Lote (Admin View) -->
-                <button id="btn-admin-add-batch" class="w-full py-2.5 bg-white border border-slate-200 text-slate-600 font-medium rounded-xl hover:bg-slate-50 transition-colors flex justify-center items-center gap-2 text-sm shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    Adicionar Pessoas (Lote)
+                <!-- Botão: Adicionar Vários -->
+                <button id="btn-bulk-add" class="w-full py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-100 transition-colors flex justify-center items-center gap-2 text-sm shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    + Adicionar lote inicial
                 </button>
 
-                <button id="btn-exit" class="relative overflow-hidden group bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white rounded-2xl p-6 shadow-lg shadow-rose-500/30 transition-all duration-200 flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed">
+                <button id="btn-exit" class="relative overflow-hidden group bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white rounded-2xl p-6 shadow-lg shadow-rose-500/30 transition-all duration-200 flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed mt-1">
                     <div class="flex flex-col items-start relative z-10">
                         <span class="text-rose-100 text-sm font-semibold uppercase tracking-wider mb-1">Próximo</span>
                         <span class="text-2xl font-bold">Atendimento</span>
@@ -196,17 +198,14 @@
 
             <!-- Stats Dashboard -->
             <div class="grid grid-cols-2 gap-4 shrink-0">
-                <!-- Stat Card 1 -->
                 <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
                     <span class="text-slate-400 text-xs font-semibold uppercase tracking-wide">Na Fila Agora</span>
                     <span id="stat-queue" class="text-3xl font-bold text-amber-500 mt-2">0</span>
                 </div>
-                <!-- Stat Card 2 -->
                 <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
                     <span class="text-slate-400 text-xs font-semibold uppercase tracking-wide">Total Atendidos</span>
                     <span id="stat-served" class="text-3xl font-bold text-indigo-500 mt-2">0</span>
                 </div>
-                <!-- Stat Card 3 (Full width) -->
                 <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 col-span-2 flex flex-col justify-between">
                     <span class="text-slate-400 text-xs font-semibold uppercase tracking-wide">Tempo Médio de Espera</span>
                     <div class="flex items-end gap-2 mt-2">
@@ -216,7 +215,7 @@
                 </div>
             </div>
 
-            <div class="mt-auto pt-6 flex flex-col gap-3 shrink-0">
+            <div class="mt-auto pt-4 flex flex-col gap-3 shrink-0">
                 <button id="btn-export" class="w-full py-3 bg-white border border-slate-300 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors flex justify-center items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Exportar CSV
@@ -229,12 +228,13 @@
         </section>
 
         <!-- Right Panel: Data Table -->
-        <section class="w-full lg:w-2/3 bg-white flex flex-col min-h-[500px] lg:min-h-0 lg:h-full">
+        <!-- O container pai da tabela se torna lg:h-full sem ultrapassar a Grid -->
+        <section class="lg:col-span-2 bg-white flex flex-col min-h-[500px] lg:min-h-0 lg:h-full">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10 shrink-0">
                 <h2 class="text-lg font-bold text-slate-700">Registro de Atendimentos</h2>
             </div>
             
-            <div class="flex-1 overflow-auto table-container relative">
+            <div class="flex-1 overflow-y-auto table-container relative">
                 <table class="w-full text-left border-collapse">
                     <thead class="sticky top-0 bg-slate-50/95 backdrop-blur shadow-sm z-10">
                         <tr>
@@ -259,7 +259,7 @@
         </section>
     </main>
 
-    <!-- Confirmation Modal (Clear Data) -->
+    <!-- Confirmation Modal -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform scale-95 transition-transform duration-200" id="confirm-modal-content">
             <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
@@ -287,15 +287,15 @@
         </div>
     </div>
 
-    <!-- Batch Add Modal -->
-    <div id="batch-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform scale-95 transition-transform duration-200" id="batch-modal-content">
-            <h3 class="text-lg font-bold text-slate-800 mb-2">Adicionar Lote</h3>
-            <p class="text-slate-500 text-sm mb-4">Quantas pessoas já estão aguardando nesta fila?</p>
-            <input type="number" id="batch-count-input" min="1" max="100" class="w-full bg-slate-50 border border-slate-300 text-slate-700 rounded-lg p-3 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-6" placeholder="Ex: 5">
+    <!-- Add Bulk (Lote) Modal -->
+    <div id="bulk-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform scale-95 transition-transform duration-200" id="bulk-modal-content">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Adicionar Fila Existente</h3>
+            <p class="text-slate-500 text-sm mb-4">Quantas pessoas já estão aguardando fisicamente na fila agora?</p>
+            <input type="number" id="bulk-count" class="w-full bg-slate-50 border border-slate-300 text-slate-700 rounded-lg p-3 font-bold text-xl text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6" placeholder="Ex: 5" min="1" value="5">
             <div class="flex gap-3 justify-end">
-                <button id="batch-modal-cancel" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors">Cancelar</button>
-                <button id="batch-modal-confirm" class="px-4 py-2 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition-colors">Adicionar</button>
+                <button id="bulk-modal-cancel" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors">Cancelar</button>
+                <button id="bulk-modal-confirm" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">Adicionar Pessoas</button>
             </div>
         </div>
     </div>
@@ -341,17 +341,14 @@
         const btnRoleAdmin = document.getElementById('btn-role-admin');
         const globalQueueSelector = document.getElementById('global-queue-selector');
         const actionQueueName = document.getElementById('action-queue-name');
-        
         const btnGiantEnter = document.getElementById('btn-giant-enter');
         const btnGiantExit = document.getElementById('btn-giant-exit');
-        const btnGiantAddBatch = document.getElementById('btn-giant-add-batch');
         const giantExitCount = document.getElementById('giant-exit-count');
         const btnsBack = document.querySelectorAll('.btn-back');
 
         const clockEl = document.getElementById('clock');
         const btnEnter = document.getElementById('btn-enter');
         const btnExit = document.getElementById('btn-exit');
-        const btnAdminAddBatch = document.getElementById('btn-admin-add-batch');
         const btnClear = document.getElementById('btn-clear');
         const btnExport = document.getElementById('btn-export');
         
@@ -363,12 +360,6 @@
         const queueModalConfirm = document.getElementById('queue-modal-confirm');
         const newQueueNameInput = document.getElementById('new-queue-name');
         
-        const batchModal = document.getElementById('batch-modal');
-        const batchModalContent = document.getElementById('batch-modal-content');
-        const batchModalCancel = document.getElementById('batch-modal-cancel');
-        const batchModalConfirm = document.getElementById('batch-modal-confirm');
-        const batchCountInput = document.getElementById('batch-count-input');
-
         const statQueue = document.getElementById('stat-queue');
         const statServed = document.getElementById('stat-served');
         const statAvgTime = document.getElementById('stat-avg-time');
@@ -380,6 +371,16 @@
         const confirmModalContent = document.getElementById('confirm-modal-content');
         const modalCancel = document.getElementById('modal-cancel');
         const modalConfirm = document.getElementById('modal-confirm');
+
+        // Lote Modal
+        const btnBulkAdd = document.getElementById('btn-bulk-add');
+        const btnGiantBulkAdd = document.getElementById('btn-giant-bulk-add');
+        const bulkModal = document.getElementById('bulk-modal');
+        const bulkModalContent = document.getElementById('bulk-modal-content');
+        const bulkModalCancel = document.getElementById('bulk-modal-cancel');
+        const bulkModalConfirm = document.getElementById('bulk-modal-confirm');
+        const bulkCountInput = document.getElementById('bulk-count');
+
         const toastContainer = document.getElementById('toast-container');
 
         // --- Initialization ---
@@ -468,41 +469,34 @@
             }
         }
 
-        // Nova Lógica de Adicionar Lote
-        async function handleAddBatch() {
+        async function handleBulkEntry() {
             if (!user) return;
-            const count = parseInt(batchCountInput.value, 10);
+            const count = parseInt(bulkCountInput.value);
+            if (isNaN(count) || count <= 0) return;
             
-            if (isNaN(count) || count <= 0) {
-                showToast('Insira um número válido maior que zero.', 'error');
-                return;
-            }
-
-            closeBatchModal();
+            closeBulkModal();
+            showToast(`Adicionando ${count} clientes...`, 'info');
+            
             const now = Date.now();
-            
             try {
                 const promises = [];
-                // Cria as senhas com intervalo de 1 segundo entre elas 
-                // para garantir que a ordem de chegada (First In) fique correta.
-                for (let i = 0; i < count; i++) {
+                // Cria X entradas no banco, subtraindo milissegundos para manter a ordem cronológica
+                for(let i = 0; i < count; i++) {
                     const ticketId = Math.floor(1000 + Math.random() * 9000).toString();
-                    const simulatedArrival = now - (count * 1000) + (i * 1000); 
-                    
                     promises.push(addDoc(collection(db, 'queue_events'), {
                         ticketId: ticketId,
-                        arrival: simulatedArrival,
+                        arrival: now - ((count - i) * 1000), 
                         service: null,
                         waitTimeMs: null,
                         queueName: currentQueue
                     }));
                 }
-                
                 await Promise.all(promises);
-                showToast(`${count} clientes adicionados à fila!`, 'success');
+                showToast(`${count} pessoas adicionadas!`, 'success');
+                bulkCountInput.value = '5'; // Reseta o padrão
             } catch (e) {
                 console.error(e);
-                showToast('Erro ao adicionar lote.', 'error');
+                showToast('Erro ao adicionar em lote.', 'error');
             }
         }
 
@@ -533,7 +527,7 @@
 
         async function clearData() {
             if (!user) return;
-            closeConfirmModal();
+            closeModal();
             const currentQueueEvents = allEvents.filter(e => e.queueName === currentQueue);
             
             try {
@@ -720,11 +714,17 @@
             btnEnter.addEventListener('click', handleEntry);
             btnExit.addEventListener('click', handleService);
             
-            btnClear.addEventListener('click', openConfirmModal);
-            modalCancel.addEventListener('click', closeConfirmModal);
+            btnClear.addEventListener('click', openModal);
+            modalCancel.addEventListener('click', closeModal);
             modalConfirm.addEventListener('click', clearData);
             
             btnExport.addEventListener('click', exportCSV);
+
+            // Modal Lote
+            btnBulkAdd.addEventListener('click', openBulkModal);
+            btnGiantBulkAdd.addEventListener('click', openBulkModal);
+            bulkModalCancel.addEventListener('click', closeBulkModal);
+            bulkModalConfirm.addEventListener('click', handleBulkEntry);
 
             // View Switching Logic
             btnRoleStart.addEventListener('click', () => showView('start'));
@@ -735,12 +735,6 @@
 
             btnGiantEnter.addEventListener('click', handleEntry);
             btnGiantExit.addEventListener('click', handleService);
-
-            // Batch Add Listeners
-            btnGiantAddBatch.addEventListener('click', openBatchModal);
-            btnAdminAddBatch.addEventListener('click', openBatchModal);
-            batchModalCancel.addEventListener('click', closeBatchModal);
-            batchModalConfirm.addEventListener('click', handleAddBatch);
 
             // Queue Selectors
             queueSelector.addEventListener('change', (e) => {
@@ -770,7 +764,7 @@
             
             btnGiantEnter.classList.add('hidden');
             btnGiantExit.classList.add('hidden');
-            btnGiantAddBatch.classList.add('hidden');
+            btnGiantBulkAdd.classList.add('hidden'); // Ocultar botão de lote por padrão
 
             actionQueueName.innerText = currentQueue;
 
@@ -781,14 +775,14 @@
             } else if (view === 'start') {
                 viewAction.classList.remove('hidden');
                 btnGiantEnter.classList.remove('hidden');
-                btnGiantAddBatch.classList.remove('hidden');
+                btnGiantBulkAdd.classList.remove('hidden'); // Exibir na Entrada
             } else if (view === 'end') {
                 viewAction.classList.remove('hidden');
                 btnGiantExit.classList.remove('hidden');
             }
         }
 
-        function openConfirmModal() {
+        function openModal() {
             confirmModal.classList.remove('hidden');
             setTimeout(() => {
                 confirmModal.classList.remove('opacity-0');
@@ -796,7 +790,7 @@
             }, 10);
         }
 
-        function closeConfirmModal() {
+        function closeModal() {
             confirmModal.classList.add('opacity-0');
             confirmModalContent.classList.add('scale-95');
             setTimeout(() => {
@@ -821,21 +815,21 @@
             }, 200);
         }
 
-        function openBatchModal() {
-            batchModal.classList.remove('hidden');
+        function openBulkModal() {
+            bulkModal.classList.remove('hidden');
             setTimeout(() => {
-                batchModal.classList.remove('opacity-0');
-                batchModalContent.classList.remove('scale-95');
+                bulkModal.classList.remove('opacity-0');
+                bulkModalContent.classList.remove('scale-95');
             }, 10);
-            batchCountInput.value = '';
-            batchCountInput.focus();
+            bulkCountInput.focus();
+            bulkCountInput.select();
         }
 
-        function closeBatchModal() {
-            batchModal.classList.add('opacity-0');
-            batchModalContent.classList.add('scale-95');
+        function closeBulkModal() {
+            bulkModal.classList.add('opacity-0');
+            bulkModalContent.classList.add('scale-95');
             setTimeout(() => {
-                batchModal.classList.add('hidden');
+                bulkModal.classList.add('hidden');
             }, 200);
         }
 
