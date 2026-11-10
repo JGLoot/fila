@@ -67,7 +67,7 @@
     </header>
 
     <!-- View: Role Selection -->
-    <main id="view-role" class="flex-1 flex flex-col p-6 max-w-md mx-auto w-full gap-5 justify-center">
+    <main id="view-role" class="flex-1 flex flex-col p-6 max-w-md mx-auto w-full gap-5 justify-center overflow-y-auto">
         <div class="text-center mb-2">
             <h2 class="text-2xl font-bold text-slate-800">Selecione seu Perfil</h2>
             <p class="text-slate-500 mt-1">Como você usará este dispositivo?</p>
@@ -104,7 +104,7 @@
     </main>
 
     <!-- View: Action (Start/End focused on Mobile) -->
-    <main id="view-action" class="hidden flex-1 flex flex-col overflow-hidden">
+    <main id="view-action" class="hidden flex-1 flex flex-col overflow-y-auto lg:overflow-hidden">
         <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white shadow-sm z-10 shrink-0">
             <button class="btn-back text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
@@ -113,11 +113,18 @@
             <span id="action-queue-name" class="font-bold text-indigo-700 bg-indigo-50 px-4 py-1.5 rounded-full text-sm border border-indigo-100">Fila</span>
         </div>
         <div class="flex-1 p-6 flex flex-col items-center justify-center bg-slate-50">
+            
             <!-- Giant Enter -->
             <button id="btn-giant-enter" class="hidden w-full max-w-[320px] aspect-square bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-[0_20px_50px_-12px_rgba(16,185,129,0.5)] flex flex-col items-center justify-center gap-4 transition-all duration-200 active:scale-90 active:shadow-sm">
                 <svg class="w-24 h-24 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <span class="text-4xl font-bold tracking-tight">ENTRADA</span>
                 <span class="text-emerald-100 font-medium text-lg">Novo Cliente</span>
+            </button>
+
+            <!-- Adicionar Lote (Action View) -->
+            <button id="btn-giant-add-batch" class="hidden mt-6 text-emerald-600 bg-emerald-50 px-5 py-2.5 rounded-full font-semibold text-sm border border-emerald-200 hover:bg-emerald-100 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                Adicionar Pessoas Existentes
             </button>
 
             <!-- Giant Exit -->
@@ -130,7 +137,7 @@
     </main>
 
     <!-- Main Content (Admin View) -->
-    <main id="view-admin" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+    <main id="view-admin" class="hidden flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden relative">
         
         <!-- Overlay Back Button for Admin -->
         <div class="absolute top-4 left-4 lg:left-6 z-20">
@@ -168,7 +175,13 @@
                     <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-active:transition-none group-active:translate-x-0 transition-transform duration-500"></div>
                 </button>
 
-                <button id="btn-exit" class="relative overflow-hidden group bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white rounded-2xl p-6 shadow-lg shadow-rose-500/30 transition-all duration-200 flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed">
+                <!-- Adicionar Lote (Admin View) -->
+                <button id="btn-admin-add-batch" class="w-full py-2.5 bg-white border border-slate-200 text-slate-600 font-medium rounded-xl hover:bg-slate-50 transition-colors flex justify-center items-center gap-2 text-sm shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Adicionar Pessoas (Lote)
+                </button>
+
+                <button id="btn-exit" class="relative overflow-hidden group bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white rounded-2xl p-6 shadow-lg shadow-rose-500/30 transition-all duration-200 flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed mt-2">
                     <div class="flex flex-col items-start relative z-10">
                         <span class="text-rose-100 text-sm font-semibold uppercase tracking-wider mb-1">Próximo</span>
                         <span class="text-2xl font-bold">Atendimento</span>
@@ -215,7 +228,7 @@
         </section>
 
         <!-- Right Panel: Data Table -->
-        <section class="w-full lg:w-2/3 bg-white flex flex-col h-full">
+        <section class="w-full lg:w-2/3 bg-white flex flex-col min-h-[500px] lg:min-h-0 lg:h-full">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10 shrink-0">
                 <h2 class="text-lg font-bold text-slate-700">Registro de Atendimentos</h2>
             </div>
@@ -245,7 +258,7 @@
         </section>
     </main>
 
-    <!-- Confirmation Modal -->
+    <!-- Confirmation Modal (Clear Data) -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform scale-95 transition-transform duration-200" id="confirm-modal-content">
             <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
@@ -269,6 +282,19 @@
             <div class="flex gap-3 justify-end">
                 <button id="queue-modal-cancel" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors">Cancelar</button>
                 <button id="queue-modal-confirm" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">Criar Fila</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Add Modal -->
+    <div id="batch-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform scale-95 transition-transform duration-200" id="batch-modal-content">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Adicionar Lote</h3>
+            <p class="text-slate-500 text-sm mb-4">Quantas pessoas já estão aguardando nesta fila?</p>
+            <input type="number" id="batch-count-input" min="1" max="100" class="w-full bg-slate-50 border border-slate-300 text-slate-700 rounded-lg p-3 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-6" placeholder="Ex: 5">
+            <div class="flex gap-3 justify-end">
+                <button id="batch-modal-cancel" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors">Cancelar</button>
+                <button id="batch-modal-confirm" class="px-4 py-2 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition-colors">Adicionar</button>
             </div>
         </div>
     </div>
@@ -314,14 +340,17 @@
         const btnRoleAdmin = document.getElementById('btn-role-admin');
         const globalQueueSelector = document.getElementById('global-queue-selector');
         const actionQueueName = document.getElementById('action-queue-name');
+        
         const btnGiantEnter = document.getElementById('btn-giant-enter');
         const btnGiantExit = document.getElementById('btn-giant-exit');
+        const btnGiantAddBatch = document.getElementById('btn-giant-add-batch');
         const giantExitCount = document.getElementById('giant-exit-count');
         const btnsBack = document.querySelectorAll('.btn-back');
 
         const clockEl = document.getElementById('clock');
         const btnEnter = document.getElementById('btn-enter');
         const btnExit = document.getElementById('btn-exit');
+        const btnAdminAddBatch = document.getElementById('btn-admin-add-batch');
         const btnClear = document.getElementById('btn-clear');
         const btnExport = document.getElementById('btn-export');
         
@@ -333,6 +362,12 @@
         const queueModalConfirm = document.getElementById('queue-modal-confirm');
         const newQueueNameInput = document.getElementById('new-queue-name');
         
+        const batchModal = document.getElementById('batch-modal');
+        const batchModalContent = document.getElementById('batch-modal-content');
+        const batchModalCancel = document.getElementById('batch-modal-cancel');
+        const batchModalConfirm = document.getElementById('batch-modal-confirm');
+        const batchCountInput = document.getElementById('batch-count-input');
+
         const statQueue = document.getElementById('stat-queue');
         const statServed = document.getElementById('stat-served');
         const statAvgTime = document.getElementById('stat-avg-time');
@@ -346,11 +381,11 @@
         const modalConfirm = document.getElementById('modal-confirm');
         const toastContainer = document.getElementById('toast-container');
 
-// --- Initialization ---
+        // --- Initialization ---
         async function init() {
             updateClock();
             setInterval(updateClock, 1000);
-            updateQueueSelector(); // <--- ADICIONE ESTA LINHA AQUI
+            updateQueueSelector(); 
             setupEventListeners();
             
             try {
@@ -366,14 +401,12 @@
         function setupRealtimeListeners() {
             if (!user) return;
             
-            // Listen to Events na raiz do banco
             const eventsRef = collection(db, 'queue_events');
             onSnapshot(eventsRef, (snapshot) => {
                 allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 render();
             }, (error) => { console.error("Erro ao ouvir eventos", error); });
 
-            // Listen to Custom Queues na raiz do banco
             const queuesRef = collection(db, 'queues');
             onSnapshot(queuesRef, (snapshot) => {
                 const customQueues = snapshot.docs.map(doc => doc.data().name);
@@ -434,6 +467,44 @@
             }
         }
 
+        // Nova Lógica de Adicionar Lote
+        async function handleAddBatch() {
+            if (!user) return;
+            const count = parseInt(batchCountInput.value, 10);
+            
+            if (isNaN(count) || count <= 0) {
+                showToast('Insira um número válido maior que zero.', 'error');
+                return;
+            }
+
+            closeBatchModal();
+            const now = Date.now();
+            
+            try {
+                const promises = [];
+                // Cria as senhas com intervalo de 1 segundo entre elas 
+                // para garantir que a ordem de chegada (First In) fique correta.
+                for (let i = 0; i < count; i++) {
+                    const ticketId = Math.floor(1000 + Math.random() * 9000).toString();
+                    const simulatedArrival = now - (count * 1000) + (i * 1000); 
+                    
+                    promises.push(addDoc(collection(db, 'queue_events'), {
+                        ticketId: ticketId,
+                        arrival: simulatedArrival,
+                        service: null,
+                        waitTimeMs: null,
+                        queueName: currentQueue
+                    }));
+                }
+                
+                await Promise.all(promises);
+                showToast(`${count} clientes adicionados à fila!`, 'success');
+            } catch (e) {
+                console.error(e);
+                showToast('Erro ao adicionar lote.', 'error');
+            }
+        }
+
         async function handleService() {
             if (!user) return;
             
@@ -461,7 +532,7 @@
 
         async function clearData() {
             if (!user) return;
-            closeModal();
+            closeConfirmModal();
             const currentQueueEvents = allEvents.filter(e => e.queueName === currentQueue);
             
             try {
@@ -648,8 +719,8 @@
             btnEnter.addEventListener('click', handleEntry);
             btnExit.addEventListener('click', handleService);
             
-            btnClear.addEventListener('click', openModal);
-            modalCancel.addEventListener('click', closeModal);
+            btnClear.addEventListener('click', openConfirmModal);
+            modalCancel.addEventListener('click', closeConfirmModal);
             modalConfirm.addEventListener('click', clearData);
             
             btnExport.addEventListener('click', exportCSV);
@@ -663,6 +734,12 @@
 
             btnGiantEnter.addEventListener('click', handleEntry);
             btnGiantExit.addEventListener('click', handleService);
+
+            // Batch Add Listeners
+            btnGiantAddBatch.addEventListener('click', openBatchModal);
+            btnAdminAddBatch.addEventListener('click', openBatchModal);
+            batchModalCancel.addEventListener('click', closeBatchModal);
+            batchModalConfirm.addEventListener('click', handleAddBatch);
 
             // Queue Selectors
             queueSelector.addEventListener('change', (e) => {
@@ -692,6 +769,7 @@
             
             btnGiantEnter.classList.add('hidden');
             btnGiantExit.classList.add('hidden');
+            btnGiantAddBatch.classList.add('hidden');
 
             actionQueueName.innerText = currentQueue;
 
@@ -702,13 +780,14 @@
             } else if (view === 'start') {
                 viewAction.classList.remove('hidden');
                 btnGiantEnter.classList.remove('hidden');
+                btnGiantAddBatch.classList.remove('hidden');
             } else if (view === 'end') {
                 viewAction.classList.remove('hidden');
                 btnGiantExit.classList.remove('hidden');
             }
         }
 
-        function openModal() {
+        function openConfirmModal() {
             confirmModal.classList.remove('hidden');
             setTimeout(() => {
                 confirmModal.classList.remove('opacity-0');
@@ -716,7 +795,7 @@
             }, 10);
         }
 
-        function closeModal() {
+        function closeConfirmModal() {
             confirmModal.classList.add('opacity-0');
             confirmModalContent.classList.add('scale-95');
             setTimeout(() => {
@@ -738,6 +817,24 @@
             queueModalContent.classList.add('scale-95');
             setTimeout(() => {
                 queueModal.classList.add('hidden');
+            }, 200);
+        }
+
+        function openBatchModal() {
+            batchModal.classList.remove('hidden');
+            setTimeout(() => {
+                batchModal.classList.remove('opacity-0');
+                batchModalContent.classList.remove('scale-95');
+            }, 10);
+            batchCountInput.value = '';
+            batchCountInput.focus();
+        }
+
+        function closeBatchModal() {
+            batchModal.classList.add('opacity-0');
+            batchModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                batchModal.classList.add('hidden');
             }, 200);
         }
 
