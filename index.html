@@ -9,6 +9,11 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* FORÇA a classe hidden a esconder elementos mesmo que tenham classes responsivas como lg:grid */
+        .hidden {
+            display: none !important;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
@@ -228,7 +233,6 @@
         </section>
 
         <!-- Right Panel: Data Table -->
-        <!-- O container pai da tabela se torna lg:h-full sem ultrapassar a Grid -->
         <section class="lg:col-span-2 bg-white flex flex-col min-h-[500px] lg:min-h-0 lg:h-full">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10 shrink-0">
                 <h2 class="text-lg font-bold text-slate-700">Registro de Atendimentos</h2>
